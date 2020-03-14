@@ -20,7 +20,13 @@ const config = {
   migrationsDir: "migrations",
 
   // The mongodb collection where the applied changes are stored. Only edit this when really necessary.
-  changelogCollectionName: "changelog"
+  changelogCollectionName: "changelog",
+
+  // The mondogb collection where lock documents are stored. Only edit this when really necessary.
+  lockCollectionName: "migrate_mongo_lock",
+
+  // Writes a lock to prevent concurrent migrations to run.
+  useLock: true
 };
 
 // Return the config as a promise

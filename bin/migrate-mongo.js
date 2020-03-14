@@ -112,6 +112,42 @@ program
       });
   });
 
+program
+  .command("lock")
+  .description("Lock to avoid concurrent migrations")
+  .option("-f --file <file>", "use a custom config file")
+  .action(options => {
+    global.options = options;
+    migrateMongo.database
+      .connect()
+      .then(({db, client}) => migrateMongo.lock.lock(db, client))
+      .then(() => {
+        console.log('Locked!')
+        process.exit(0);
+      })
+      .catch(err => {
+        handleError(err);
+      });
+  });
+
+program
+  .command("unlock")
+  .description("Unlock migrations")
+  .option("-f --file <file>", "use a custom config file")
+  .action(options => {
+    global.options = options;
+    migrateMongo.database
+      .connect()
+      .then(({db, client}) => migrateMongo.lock.unlock(db, client))
+      .then(() => {
+        console.log('Unlocked!')
+        process.exit(0);
+      })
+      .catch(err => {
+        handleError(err);
+      });
+  });
+
 program.parse(process.argv);
 
 if (_.isEmpty(program.rawArgs)) {

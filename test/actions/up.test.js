@@ -10,6 +10,7 @@ describe("up", () => {
   let migrationsDir;
   let db;
   let client;
+  let lock;
 
   let firstPendingMigration;
   let secondPendingMigration;
@@ -84,11 +85,19 @@ describe("up", () => {
     };
   }
 
+  function mockLock() {
+    return {
+      lock: sinon.stub().resolves(),
+      unlock: sinon.stub().resolves()
+    }
+  }
+
   function loadUpWithInjectedMocks() {
     return proxyquire("../../lib/actions/up", {
       "./status": status,
       "../env/configFile": configFile,
-      "../env/migrationsDir": migrationsDir
+      "../env/migrationsDir": migrationsDir,
+      "./lock": lock
     });
   }
 
@@ -102,6 +111,7 @@ describe("up", () => {
     migrationsDir = mockMigrationsDir();
     db = mockDb();
     client = mockClient();
+    lock = mockLock();
 
     up = loadUpWithInjectedMocks();
   });
@@ -201,4 +211,29 @@ describe("up", () => {
       );
     }
   });
+
+  it("should not lock and unlock when not configured", async () => {
+    await up(db);
+    expect(lock.lock.called).to.equal(false);
+    expect(lock.unlock.called).to.equal(false);
+  })
+
+  it("should lock and unlock when configured", async () => {
+    configFile.read.returns({ changelogCollectionName: "changelog", useLock: true });
+    await up(db);
+    expect(lock.lock.called).to.equal(true);
+    expect(lock.unlock.called).to.equal(true);
+  })
+
+  it("should unlock also with unhandled exception", async () => {
+    configFile.read.returns({useLock: true});
+    status.rejects();
+    try {
+      await up(db);
+      expect.fail("Error was not thrown");
+    }
+    catch(ex) {
+      expect(lock.unlock.called).to.equal(true);
+    }
+  })
 });
