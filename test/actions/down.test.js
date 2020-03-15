@@ -12,6 +12,7 @@ describe("down", () => {
   let client;
   let migration;
   let changelogCollection;
+  let lock;
 
   function mockStatus() {
     return sinon.stub().returns(
@@ -66,11 +67,19 @@ describe("down", () => {
     };
   }
 
+  function mockLock() {
+    return {
+      lock: sinon.stub().resolves(),
+      unlock: sinon.stub().resolves()
+    }
+  }
+
   function loadDownWithInjectedMocks() {
     return proxyquire("../../lib/actions/down", {
       "./status": status,
       "../env/configFile": configFile,
-      "../env/migrationsDir": migrationsDir
+      "../env/migrationsDir": migrationsDir,
+      "./lock": lock
     });
   }
 
@@ -83,6 +92,7 @@ describe("down", () => {
     migrationsDir = mockMigrationsDir();
     db = mockDb();
     client = mockClient();
+    lock = mockLock();
 
     down = loadDownWithInjectedMocks();
   });
@@ -179,4 +189,29 @@ describe("down", () => {
     const items = await down(db);
     expect(items).to.deep.equal(["20160609113225-last_migration.js"]);
   });
+
+  it("should not lock and unlock when not configured", async () => {
+    await down(db);
+    expect(lock.lock.called).to.equal(false);
+    expect(lock.unlock.called).to.equal(false);
+  })
+
+  it("should lock and unlock when configured", async () => {
+    configFile.read.returns({ changelogCollectionName: "changelog", useLock: true });
+    await down(db);
+    expect(lock.lock.called).to.equal(true);
+    expect(lock.unlock.called).to.equal(true);
+  })
+
+  it("should unlock also with unhandled exception", async () => {
+    configFile.read.returns({useLock: true});
+    status.rejects();
+    try {
+      await down(db);
+      expect.fail("Error was not thrown");
+    }
+    catch(ex) {
+      expect(lock.unlock.called).to.equal(true);
+    }
+  })
 });
