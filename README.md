@@ -24,6 +24,8 @@ Usage: migrate-mongo [options] [command]
     up [options]          run all unapplied database migrations
     down [options]        undo the last applied database migration
     status [options]      print the changelog of the database
+    lock [options]        Lock to avoid concurrent migrations
+    unlock [options]      Unlock migrations
 
   Options:
 
@@ -74,7 +76,13 @@ module.exports = {
   migrationsDir: "migrations",
 
   // The mongodb collection where the applied changes are stored. Only edit this when really necessary.
-  changelogCollectionName: "changelog"
+  changelogCollectionName: "changelog",
+
+  // The mondogb collection where lock documents are stored. Only edit this when really necessary.
+  lockCollectionName: "migrate_mongo_lock",
+
+  // Writes a lock to prevent concurrent migrations to run.
+  useLock: true
 };
 ````
 
