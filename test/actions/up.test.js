@@ -24,6 +24,10 @@ describe("up", () => {
           appliedAt: new Date()
         },
         {
+          fileName: "20160606093207-first_ignored_migration.js",
+          appliedAt: 'IGNORED'
+        },
+        {
           fileName: "20160606093207-second_applied_migration.js",
           appliedAt: new Date()
         },
@@ -57,6 +61,9 @@ describe("up", () => {
     mock.loadMigration
       .withArgs("20160608060209-second_pending_migration.js")
       .returns(Promise.resolve(secondPendingMigration));
+    mock.loadMigration
+      .withArgs("20160606093207-first_ignored_migration.js")
+      .rejects("Should not have been called")
     return mock;
   }
 

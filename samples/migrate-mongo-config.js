@@ -26,7 +26,10 @@ const config = {
   lockCollectionName: "migrate_mongo_lock",
 
   // Writes a lock to prevent concurrent migrations to run.
-  useLock: true
+  useLock: true,
+
+  // Skip migrations older than the latest applied one
+  ignoreOldMigrations: true
 };
 
 // Return the config as a promise

@@ -20,7 +20,8 @@ describe("status", () => {
           Promise.resolve([
             "20160509113224-first_migration.js",
             "20160512091701-second_migration.js",
-            "20160513155321-third_migration.js"
+            "20160513155321-third_migration.js",
+            "20160515122345-fourth_migration.js"
           ])
         )
     };
@@ -59,7 +60,7 @@ describe("status", () => {
               appliedAt: new Date("2016-06-03T20:10:12.123Z")
             },
             {
-              fileName: "20160512091701-second_migration.js",
+              fileName: "20160513155321-third_migration.js",
               appliedAt: new Date("2016-06-09T20:10:12.123Z")
             }
           ])
@@ -161,12 +162,43 @@ describe("status", () => {
         fileName: "20160509113224-first_migration.js"
       },
       {
-        appliedAt: "2016-06-09T20:10:12.123Z",
+        appliedAt: "PENDING",
         fileName: "20160512091701-second_migration.js"
       },
       {
-        appliedAt: "PENDING",
+        appliedAt: "2016-06-09T20:10:12.123Z",
         fileName: "20160513155321-third_migration.js"
+      },
+      {
+        appliedAt: "PENDING",
+        fileName: "20160515122345-fourth_migration.js"
+      }
+    ]);
+  });
+
+  it("should mark migration as IGNORED when configured", async () => {
+    configFile.read.returns({
+      changelogCollectionName: "changelog",
+      ignoreOldMigrations: true
+    })
+
+    const statusItems = await status(db);
+    expect(statusItems).to.deep.equal([
+      {
+        appliedAt: "2016-06-03T20:10:12.123Z",
+        fileName: "20160509113224-first_migration.js"
+      },
+      {
+        appliedAt: "IGNORED",
+        fileName: "20160512091701-second_migration.js"
+      },
+      {
+        appliedAt: "2016-06-09T20:10:12.123Z",
+        fileName: "20160513155321-third_migration.js"
+      },
+      {
+        appliedAt: "PENDING",
+        fileName: "20160515122345-fourth_migration.js"
       }
     ]);
   });
