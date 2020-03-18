@@ -11,3 +11,6 @@ coverage
 
 # Visual Studio Code files
 .vscode
+
+# Bundle binary
+migrate-mongo
