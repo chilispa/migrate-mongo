@@ -55,6 +55,24 @@ program
       .catch(err => handleError(err));
   });
 
+  program
+  .command("baseline [migration]")
+  .description("Mark as executed all migrations up to [migration]")
+  .option("-f --file <file>", "use a custom config file")
+  .action((migration, options) => {
+    global.options = options;
+    migrateMongo.database
+    .connect()
+    .then(({db}) => migrateMongo.baseline(db, migration))
+    .then(migrated => {
+      printMigrated(migrated);
+      process.exit(0);
+    })
+    .catch(err => {
+      handleError(err);
+    });
+  });
+
 program
   .command("up")
   .description("run all pending database migrations")
