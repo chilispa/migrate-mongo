@@ -101,6 +101,19 @@ describe("configFile", () => {
       } catch (err) {
         expect(err.message).to.match(new RegExp(`Cannot find module '${configPath}'`));
       }
+      global.options = {}
     });
+
+    it("should get custom absolute path from env variable", async () => {
+      process.env.MIGRATE_MONGO_CONFIG = "/my/env/path/conf.js"
+      try {
+        await configFile.read();
+        expect.fail("Error was not thrown");
+      } catch (err) {
+        expect(err.message).to.match(
+          new RegExp("Cannot find module '/my/env/path/conf.js'")
+        );
+      }
+    })
   });
 });
