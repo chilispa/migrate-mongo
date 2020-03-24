@@ -57,7 +57,8 @@ describe("status", () => {
           Promise.resolve([
             {
               fileName: "test/20160509113224-first_migration.js",
-              appliedAt: new Date("2016-06-03T20:10:12.123Z")
+              appliedAt: new Date("2016-06-03T20:10:12.123Z"),
+              baseline: true
             },
             {
               fileName: "test/20160513155321-third_migration.js",
@@ -158,7 +159,7 @@ describe("status", () => {
     const statusItems = await status(db);
     expect(statusItems).to.deep.equal([
       {
-        appliedAt: "2016-06-03T20:10:12.123Z",
+        appliedAt: "BASELINE",
         fileName: "test/20160509113224-first_migration.js"
       },
       {
@@ -185,7 +186,7 @@ describe("status", () => {
     const statusItems = await status(db);
     expect(statusItems).to.deep.equal([
       {
-        appliedAt: "2016-06-03T20:10:12.123Z",
+        appliedAt: "BASELINE",
         fileName: "test/20160509113224-first_migration.js"
       },
       {

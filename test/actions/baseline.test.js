@@ -112,11 +112,13 @@ describe("baseline", () => {
     expect(changelogCollection.insertOne.callCount).to.equal(2);
     expect(changelogCollection.insertOne.getCall(0).args[0]).to.deep.equal({
       appliedAt: new Date("2016-06-09T08:07:00.077Z"),
-      fileName: "test/20160606093207-first_ignored_migration.js"
+      fileName: "test/20160606093207-first_ignored_migration.js",
+      baseline: true
     });
     expect(changelogCollection.insertOne.getCall(1).args[0]).to.deep.equal({
       appliedAt: new Date("2016-06-09T08:07:00.077Z"),
-      fileName: "prod/20160607173840-first_pending_migration.js"
+      fileName: "prod/20160607173840-first_pending_migration.js",
+      baseline: true
     });
     clock.restore();
   });

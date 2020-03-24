@@ -12,6 +12,12 @@ function printMigrated(migrated = []) {
   });
 }
 
+function printBaselined(migrated = []) {
+  migrated.forEach(migratedItem => {
+    console.log(`BASELINED: ${migratedItem}`);
+  });
+}
+
 function handleError(err) {
   console.error(`ERROR: ${err.message}`);
   process.exit(1);
@@ -65,7 +71,7 @@ program
     .connect()
     .then(({db}) => migrateMongo.baseline(db, migration))
     .then(migrated => {
-      printMigrated(migrated);
+      printBaselined(migrated);
       process.exit(0);
     })
     .catch(err => {
