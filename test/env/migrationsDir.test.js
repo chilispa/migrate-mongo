@@ -144,6 +144,16 @@ describe("migrationsDir", () => {
       const files = await migrationsDir.getFileNames();
       expect(files).to.deep.equal(["file1.js", "test/file2.js", "prod/file3.js"]);
     });
+
+    it("should read recursively the directory and filter results", async () => {
+      configFile.read.returns({
+        migrationsDir: "migrations",
+        include: "prod/.*"
+      });
+      getRecursiveFiles.returns(Promise.resolve(["migrations/file1.js", "migrations/prod/file4.js", "migrations/prod/file3.js", "migrations/test/file2.js"]));
+      const files = await migrationsDir.getFileNames();
+      expect(files).to.deep.equal(["prod/file3.js", "prod/file4.js"]);
+    });
   });
 
   describe("loadMigration()", () => {
